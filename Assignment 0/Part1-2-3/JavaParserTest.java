@@ -1,10 +1,14 @@
-import java.io.IOException;
 
+/* PART 3 */
+
+import java.io.IOException;
+import java.util.*;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.TokenStreamRewriter;
 
 public class JavaParserTest extends JavaBaseListener{
 
@@ -24,20 +28,14 @@ public class JavaParserTest extends JavaBaseListener{
     	ParseTree tree = parser.compilationUnit();
     	ParseTreeWalker walker = new ParseTreeWalker(); // create standard walker
     	JavaParserTest listener = new JavaParserTest(); // create a parse tree listener
-    	walker.walk(listener, tree); // traverse parse tree with listener
-    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void enterStatement(JavaParser.StatementContext ctx){
-		System.out.println("enterStatement");
-	    if (ctx.getStart().getText().equals("if")){
-                String child = ctx.getChild(1).getText().replace("(","").replace(")","");
-                     if(variables.contains(child) && child.length() >3) {
-                         String field = "{ \n\t\t\t\t System.out.println(\""+child+""+ctx.getStart().getLine()+"\")}"
-                      } 
-             }
-	}
+    	ModifyIfListner extractor = new ModifyIfListner(tokens);
+
+    	walker.walk(extractor, tree); // traverse parse tree with listener
+		System.out.print(extractor.rewriter.getText());
+
+    }
 }
+
+
+	
